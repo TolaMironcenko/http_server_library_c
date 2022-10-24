@@ -1,0 +1,71 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+.header {
+    padding: 10px;
+    text-align: center;
+}
+
+.point {
+    background-color: antiquewhite;
+    margin: 10px;
+    border-radius: 10px;
+    padding: 10px;
+    border: 2px solid green;
+    height: 100px;
+    overflow: hidden;
+    transition: 0.5s;
+}
+
+.point.active {
+    height: max-content;
+}
+
+.headerpoint {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+}
+
+.bodypoint {
+    background-color: black;
+    color: white;
+    padding: 10px;
+    border-radius: 10px;
+    margin: 10px;
+    animation: start 0.3s;
+}
+
+.marg {
+    animation: start 0.3s;
+}
+
+@keyframes start {
+    0% {
+        transform: scale(0);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.getpointbutton {
+    cursor: pointer;
+    transition: 0.5s;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    background-color: aliceblue;
+}
+
+.getpointbutton:hover {
+    background-color: beige;
+}
+
+.marg {
+    margin: 10px;
+}
