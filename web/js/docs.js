@@ -1,5 +1,6 @@
 const getbuttonmessage = document.querySelector('.getpointbutton.message')
 const point = document.querySelector('.point.message')
+const openbutton = document.querySelector('.openbutton.marg.message')
 
 getbuttonmessage.addEventListener('click', () => {
     fetch("http://127.0.0.1:54321/message/", {
@@ -27,4 +28,18 @@ getbuttonmessage.addEventListener('click', () => {
                 bodypoint.innerHTML = JSON.stringify(result, undefined, 2);
             }
         })
+})
+
+openbutton.addEventListener('click', () => {
+    if (document.querySelector('.bodypoint.preview') == null) {
+        const he = document.createElement('h5')
+                he.classList.add('headpoint', 'marg', 'mes')
+                he.innerHTML = 'PREVIEW'
+                const bodypoint = document.createElement('pre')
+                bodypoint.classList.add('bodypoint', 'preview')
+                bodypoint.innerHTML = JSON.stringify(JSON.parse('{"message": "text","username": "text"}'), undefined, 2)
+                point.append(he, bodypoint)
+                point.classList.add('active')
+    }
+    point.classList.add('active')
 })

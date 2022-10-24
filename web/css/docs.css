@@ -53,7 +53,7 @@
     }
 }
 
-.getpointbutton {
+button {
     cursor: pointer;
     transition: 0.5s;
     padding: 10px;
@@ -62,7 +62,7 @@
     background-color: aliceblue;
 }
 
-.getpointbutton:hover {
+button:hover {
     background-color: beige;
 }
 
