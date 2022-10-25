@@ -3,7 +3,6 @@
 #include <stdlib.h>
 
 #include "tree.h"
-#include "../type/type.h"
 
 typedef struct tree_node {
     struct {

@@ -40,7 +40,7 @@ void json_response_http(int conn, HTTPreq *request) {
         http_response(conn, "web/pages/page404.html", "text/html");
         return;
     }
-    json_response(conn, "{\"message\" : \"hello world\", \"username\" : \"tola\"}");
+    json_response(conn, "{\"message\" : \"hello govno\", \"username\" : \"nuhai bebru\"}");
 }
 
 void about_page(int conn, HTTPreq *request) {

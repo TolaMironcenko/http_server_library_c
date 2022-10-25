@@ -4,7 +4,6 @@
 
 #include "../hashtab/hashtab.h"
 #include "../tree/tree.h"
-#include "../type/type.h"
 
 typedef struct HashTab {
     struct {
