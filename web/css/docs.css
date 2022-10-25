@@ -17,7 +17,7 @@
     border: 2px solid green;
     height: 100px;
     overflow: hidden;
-    transition: 0.5s;
+    transition: 0.5s all ease-in-out;
 }
 
 .point.active {
@@ -37,7 +37,7 @@
     padding: 10px;
     border-radius: 10px;
     margin: 10px;
-    animation: start 0.3s;
+    animation: start 0.3s ease-in-out;
 }
 
 .marg {
