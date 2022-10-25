@@ -55,6 +55,7 @@ extern void handle_http(HTTP *http, char *path, void(*handle)(int, HTTPreq*)) {
         http->funcs = (void(**)(int, HTTPreq*))realloc(http->funcs,
                                                        http->cap * (sizeof (void(*)(int, HTTPreq*))));
     }
+//    println_hashtab_format(http->tab);
 }
 
 extern int8_t listen_http(HTTP *http) {
