@@ -3,12 +3,9 @@ CFLAGS = -Wall -Werror
 CFILES = src/main.c src/lib/http/http.c src/lib/net/net.c src/lib/hashtab/hashtab.c src/lib/tree/tree.c src/lib/type/type.c
 OUTFILES = main
 
-all:
-	@echo ">>>>>>>>>>>>>>>>>>>>>>>>>>"
-	@make clean
-	@make build
-	@make run
-	@echo "<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+default: all
+
+all: clean build
 
 build:
 	@echo "compiling..."

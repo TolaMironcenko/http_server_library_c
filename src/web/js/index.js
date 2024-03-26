@@ -1,4 +1,4 @@
-fetch("http://127.0.0.1:54321/message/", {
+fetch("http://127.0.0.1:43243/message/", {
     headers: {
         Accept: 'application/json' /* формат данных json */,
         'Content-Type': 'application/json' /* формат данных json */,
