@@ -77,6 +77,24 @@ void docs_page_js(int conn, HTTPreq *request) {
     http_response(conn, "web/js/docs.js", "text/javascript; charset=utf-8");
 }
 
+void video(int conn, HTTPreq *request) {
+    printf("%s - %s - %s\n", request->method, request->path,  request->proto);
+    if(strcmp(request->path, "/video.mp4") != 0) {
+        parsehtml_http(conn, "web/pages/page404.html");
+        return;
+    }
+    http_response(conn, "video.mp4", "video/mp4");
+}
+
+void image(int conn, HTTPreq *request) {
+    printf("%s - %s - %s\n", request->method, request->path,  request->proto);
+    if(strcmp(request->path, "/image.png") != 0) {
+        parsehtml_http(conn, "web/pages/page404.html");
+        return;
+    }
+    http_response(conn, "image.png", "image/png");
+}
+
 int main(void) {
     system("clear");
 
@@ -90,6 +108,9 @@ int main(void) {
     handle_http(serve, "/docs/", docs_page);
     handle_http(serve, "/docs/docs.css", docs_page_css);
     handle_http(serve, "/docs/docs.js", docs_page_js);
+    handle_http(serve, "/video.mp4", video);
+    handle_http(serve, "/image.png", image);
+
 
     listen_http(serve);
     free_http(serve);

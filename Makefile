@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -Werror
-CFILES = main.c lib/http/http.c lib/net/net.c lib/hashtab/hashtab.c lib/tree/tree.c lib/type/type.c
+CFILES = src/main.c src/lib/http/http.c src/lib/net/net.c src/lib/hashtab/hashtab.c src/lib/tree/tree.c src/lib/type/type.c
 OUTFILES = main
 
 all:
@@ -12,12 +12,12 @@ all:
 
 build:
 	@echo "compiling..."
-	@$(CC) $(CFLAGS) -o $(OUTFILES) $(CFILES)
+	@$(CC) $(CFLAGS) -o bin/$(OUTFILES) $(CFILES)
 	@echo "compile successful."
 
 run:
 	@echo "running..."
-	@./$(OUTFILES)
+	@./bin/$(OUTFILES)
 
 clean:
 	@echo "cleaning..."
