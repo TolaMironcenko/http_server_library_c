@@ -9,6 +9,7 @@
 #include <string.h>
 #include "index.h"
 #include "docs.h"
+#include <pthread.h> 
 
 void json_response_http(int conn, HTTPreq *request) {
     printf("%s - %s - %s\n", request->method, request->path,  request->proto);
@@ -33,7 +34,13 @@ void video(int conn, HTTPreq *request) {
         parsehtml_http(conn, "web/pages/page404.html");
         return;
     }
-    http_response(conn, "video.mp4", "video/mp4");
+    param p;
+    p.conn = conn;
+    memset(&p.filename, '\0', 1024);
+    strcpy(p.filename, "video.mp4");
+    pthread_t thread_id;
+    pthread_create(&thread_id, 0, (void*)&send_video, (void*)&p); 
+    // send_video(conn, "video.mp4");
 }
 
 void image(int conn, HTTPreq *request) {
@@ -47,6 +54,7 @@ void image(int conn, HTTPreq *request) {
 
 int main(void) {
     system("clear");
+    // printf("%d\n", BUFSIZ);
 
     HTTP *serve = new_http("127.0.0.1:43243");
 

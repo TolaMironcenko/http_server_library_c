@@ -16,6 +16,11 @@ typedef struct HTTPreq {
     size_t index;
 } HTTPreq;
 
+typedef struct {
+    int conn;
+    char filename[1024];
+} param;
+
 typedef struct HTTP HTTP;
 
 extern HTTP *new_http(char *address);
@@ -29,6 +34,8 @@ extern void parsehtml_http(int conn, char *filename);
 extern void json_response(int conn, char *json);
 
 extern void http_response(int conn, char *filename, char *filetype_http);
+
+extern void send_video(void *arg);
 
 extern void http_response404(int conn, char *filename, char *filetype_http);
 

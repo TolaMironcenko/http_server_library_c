@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <unistd.h>
 #include "../hashtab/hashtab.h"
 #include "../net/net.h"
 #include "http.h"
@@ -13,6 +14,8 @@
 #define METHOD_SIZE 16
 #define PATH_SIZE   2048
 #define PROTO_SIZE  16
+
+#define BUFFERSIZE 8192
 
 typedef struct HTTP {
     char *host;
@@ -70,13 +73,13 @@ extern int8_t listen_http(HTTP *http) {
         }
         HTTPreq req = _new_request();
         while(1) {
-            char buffer[BUFSIZ] = {0};
-            int n = recv_net(conn, buffer, BUFSIZ);
+            char buffer[BUFFERSIZE] = {0};
+            int n = recv_net(conn, buffer, BUFFERSIZE);
             if (n < 0) {
                 break;
             }
             _parse_request(&req, buffer, n);
-            if (n != BUFSIZ) {
+            if (n != BUFFERSIZE) {
                 break;
             }
         }
@@ -88,14 +91,14 @@ extern int8_t listen_http(HTTP *http) {
 }
 
 extern void parsehtml_http(int conn, char *filename) {
-    char buffer[BUFSIZ] = "HTTP/1.1 200 OK\r\nContent-type: text/html\r\n\r\n";
+    char buffer[BUFFERSIZE] = "HTTP/1.1 200 OK\r\nContent-type: text/html\r\n\r\n";
     size_t readsize = strlen(buffer);
     send_net(conn, buffer, readsize);
     FILE *file = fopen(filename, "r");
     if (file == NULL) {
         return;
     }
-    while((readsize = fread(buffer, sizeof(char), BUFSIZ, file)) != 0) {
+    while((readsize = fread(buffer, sizeof(char), BUFFERSIZE, file)) != 0) {
         send_net(conn, buffer, readsize);
     }
     fclose(file);
@@ -177,7 +180,7 @@ static int8_t _switch_http(HTTP *http, int conn, HTTPreq *request) {
 }
 
 extern void http_response404(int conn, char *filename, char *filetype_http) {
-    char buffer[BUFSIZ] = "HTTP/1.1 404 not found\r\n"
+    char buffer[BUFFERSIZE] = "HTTP/1.1 404 not found\r\n"
                           "Version: HTTP/1.1\r\n"
                           "Content-type: ";
     strcat(buffer, filetype_http);
@@ -188,7 +191,7 @@ extern void http_response404(int conn, char *filename, char *filetype_http) {
     if (file == NULL) {
         return;
     }
-    while((readsize = fread(buffer, sizeof(char), BUFSIZ, file)) != 0) {
+    while((readsize = fread(buffer, sizeof(char), BUFFERSIZE, file)) != 0) {
         send_net(conn, buffer, readsize);
     }
     fclose(file);
@@ -199,7 +202,7 @@ static void _page404_http(int conn) {
 }
 
 extern void json_response(int conn, char *json) {
-    char buffer[BUFSIZ] = "HTTP/1.1 200 OK\r\n"
+    char buffer[BUFFERSIZE] = "HTTP/1.1 200 OK\r\n"
                           "Version: HTTP/1.1\r\n"
                           "Content-type: application/json\r\n\r\n";
     strcat(buffer, json);
@@ -208,19 +211,76 @@ extern void json_response(int conn, char *json) {
 }
 
 extern void http_response(int conn, char *filename, char *filetype_http) {
-    char buffer[BUFSIZ] = "HTTP/1.1 200 OK\r\n"
+    char buffer[BUFFERSIZE] = "HTTP/1.1 200 OK\r\n"
                           "Version: HTTP/1.1\r\n"
                           "Content-type: ";
     strcat(buffer, filetype_http);
     strcat(buffer, "\r\n\r\n");
     size_t readsize = strlen(buffer);
     send_net(conn, buffer, readsize);
-    FILE *file = fopen(filename, "r");
+    FILE *file = fopen(filename, "rb");
     if (file == NULL) {
         return;
     }
-    while((readsize = fread(buffer, sizeof(char), BUFSIZ, file)) != 0) {
+    while((readsize = fread(buffer, sizeof(char), BUFFERSIZE, file)) > 0) {
         send_net(conn, buffer, readsize);
     }
     fclose(file);
+}
+
+extern void send_video(void *arg) {
+    param * p = (param *)arg;
+    int conn = p->conn;
+    char filename[1024];
+    memset(&filename, '\0', 1024);
+    strcpy(filename, p->filename);
+
+    char buffer[BUFFERSIZE];
+    int chunk_size = 4096;
+    char chunk_buffer[chunk_size];
+    int start_byte = 0;
+    int end_byte = 0;
+    memset(&buffer, '\0', BUFFERSIZE);
+    memset(&chunk_buffer, '\0', chunk_size);
+    // sprintf(buffer, "HTTP/1.1 200 OK\r\n"
+    //                 "Version: HTTP/1.1\r\n"
+    //                 "Content-Range: bytes %d-%d\r\n"
+    //                 "Accept-Ranges: bytes\r\n"
+    //                 "Content-Length: %d\r\n"
+    //                 "Content-type: video/mp4\r\n"
+    //                 "\r\n", start_byte, end_byte, chunk_size);
+
+    FILE *file = fopen(filename, "rb");
+    if (file == NULL) {
+        return;
+    }
+
+    fseek(file, 0, SEEK_END);
+    int file_size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    int bytes_read;
+    while((bytes_read = fread(chunk_buffer, 1, chunk_size, file)) > 0) {
+        // printf("%s\n\n", chunk_buffer);
+        start_byte = end_byte;
+        end_byte += chunk_size;
+
+        memset(&buffer, '\0', BUFFERSIZE);
+        sprintf(buffer, "HTTP/1.1 200 OK\r\n"
+                    "Version: HTTP/1.1\r\n"
+                    "Content-Range: bytes %d-%d/%d\r\n"
+                    "Accept-Ranges: bytes\r\n"
+                    "Content-Length: %d\r\n"
+                    "Content-type: video/mp4\r\n"
+                    "\r\n"
+                    "%s", start_byte, end_byte, file_size, bytes_read, chunk_buffer);
+        
+        memset(chunk_buffer, '\0', chunk_size);
+        printf("%s\n\n", buffer);
+        send_net(conn, buffer, BUFFERSIZE);
+        // sleep(2);
+    }
+    fclose(file);
+    close_net(conn);
+    // long file_size = 
 }
